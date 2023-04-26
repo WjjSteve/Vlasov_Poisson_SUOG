@@ -1,0 +1,35 @@
+from ufl import (Coefficient, dx, FiniteElement, VectorElement,
+                 dot, grad,
+                 triangle, TestFunction, TrialFunction)
+
+scalar = FiniteElement("Lagrange", triangle, 1)
+vector = VectorElement("Lagrange", triangle, 2)
+dg = FiniteElement("Discontinuous Lagrange", triangle, 1)
+
+u = TrialFunction(scalar)
+w  = TestFunction(scalar)
+
+u0 = Coefficient(scalar)
+b  = Coefficient(vector)
+v = Coefficient(scalar)
+phi = Coefficient(scalar)
+b = as_vector((v,-phi.dx(0)))
+
+p = TrialFunction(dg)
+q = TestFunction(dg)
+cv = CellVolume(triangle)
+h = sqrt(2*cv)/2
+
+a_tau = p*q*dx
+L_tau = h/sqrt(b[0]*b[0]+b[1]*b[1])*q*dx
+
+k = Constant(triangle)
+tau = Coefficient(dg)
+
+a_vp = u*(w+tau*dot(b,grad(w)))*dx + k*dot(b, grad(u))*(w+tau*dot(b,grad(w)))*dx 
+L_vp = u0*(w+tau*dot(b,grad(w)))*dx 
+
+forms = [a_tau,L_tau,a_vp,L_vp]
+
+
+

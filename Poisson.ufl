@@ -1,0 +1,21 @@
+from ufl import (Coefficient, ds, dx, FiniteElement,
+                 grad, inner,
+                 interval, TestFunctions, TrialFunctions)
+
+DG = FiniteElement("Discontinuous Lagrange", interval, 0)
+V = FiniteElement("Lagrange", interval, 1)
+R = FiniteElement("R", interval, 0)
+element = V * R
+
+(u, c) = TrialFunctions(element)
+(v, d) = TestFunctions(element)
+f = Coefficient(V)
+g = Coefficient(V)
+
+a = (inner(grad(u), grad(v)) + c*v + u*d)*dx
+L = f*v*dx
+
+phi = Coefficient(V)
+E = -phi.dx(0)*-phi.dx(0)*dx
+
+forms = [a,L,E]
